@@ -37,10 +37,12 @@ jobs:
           command: |
             export version=$(cat versionfile)
             echo $version
-            export shvar=$(git tag)
+            export shvar1=$(pwd)
+            export shvar2=$(ls -la)
             export tagvalue=$(git tag | grep ${version})
             echo '============='
-            echo $shvar
+            echo $shvar1
+            echo $shvar2
             echo '========'
             echo '========'
             echo $tagvalue
