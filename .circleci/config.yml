@@ -59,7 +59,7 @@ jobs:
             export version=$(cat versionfile)
             
             zip -r "output/TechChallengeApp_${version}_linux64.zip" dist/*
-            
+
       - run:
           name: Release if new version
           command: |
@@ -74,10 +74,10 @@ jobs:
 
               if [ -z "${prerelease}" ]; then
                 echo "No pre-release in version, creating release"
-                ghr -u servian ${version} output
+                ghr -u shan-siriwardana ${version} output
               else
                 echo "Found pre-release in version, creating pre-release"
-                ghr -u servian -prerelease ${version} output
+                ghr -u shan-siriwardana -prerelease ${version} output
               fi
             fi
 
