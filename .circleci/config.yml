@@ -27,7 +27,7 @@ jobs:
             echo '============= print 1 & 2 ======'
             echo $shvar1
             echo $shvar2
-            echo '======== print 3 ========'
+            echo '======== print 3 =========='
             echo '========'
             echo $tagvalue
             echo '============='
