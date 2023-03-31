@@ -69,6 +69,7 @@ jobs:
             export tagvalue=$(git tag | grep ${version})
             export prerelease=$(echo ${version} | grep 'pre-release')
             echo $shvar
+            echo ====
             if [ -z "${tagvalue}" ]; then
               go install github.com/tcnksm/ghr@latest
 
