@@ -37,15 +37,13 @@ jobs:
           command: |
             export version=$(cat versionfile)
             echo $version
-            export shvar1=$(git branch)
-            export shvar2=$(git branch -a)
-            export shvar3=$(ls -la .git)
+            export shvar1=$(git tag)
+            export shvar2=$(ls -la .git)
             export tagvalue=$(git tag | grep ${version})
             echo '============= print 1 & 2 ======'
             echo $shvar1
             echo $shvar2
             echo '======== print 3 ========'
-            echo $shvar3
             echo '========'
             echo $tagvalue
             echo '============='
@@ -76,5 +74,3 @@ workflows:
           filters:
             branches:
               only: master
-            tags:
-              ignore: /.*/
