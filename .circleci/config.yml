@@ -39,13 +39,13 @@ jobs:
             echo $version
             export shvar1=$(git branch)
             export shvar2=$(git branch -a)
-            export shvar3=$(ls -la)
+            export shvar3=$(ls -la .git)
             export tagvalue=$(git tag | grep ${version})
-            echo '============='
+            echo '============= print 1 & 2 ======'
             echo $shvar1
-            echo $shvar3
             echo $shvar2
-            echo '========'
+            echo '======== print 3 ========'
+            echo $shvar3
             echo '========'
             echo $tagvalue
             echo '============='
