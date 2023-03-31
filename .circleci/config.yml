@@ -17,6 +17,7 @@ jobs:
 
     steps:
       - checkout
+          fetch-depth: 0
       - run:
           name: Release if new version
           command: |
