@@ -10,31 +10,8 @@ jobs:
     steps:
       - checkout
 
-      # build and test
-      - run: go get -v -t -d ./...
-      - run: go build -v
-      - run: go test -v -race -cover ./...
-
-  deploy:
-    docker:
-      - image: cimg/go:1.19
-
-    steps:
-      - checkout
-
-      - run:
-          name: Setup
-          command: |
-            go get -v -t -d ./...
-            go install github.com/GeertJohan/go.rice/rice@latest
-            mkdir output
-            go build -ldflags="-s -w" -a -v -o TechChallengeApp .
-            ls
-            ./TechChallengeApp --version | sed -e 's/TechChallengeApp version /v./' > versionfile
-
-
       - run: 
-          name: Build for linux
+          name: Build & test the executable for linux
           environment:
             GOOS: linux
             GOARCH: amd64
@@ -44,12 +21,19 @@ jobs:
             fi
             
             mkdir -p dist
+            go get -v -t -d ./...
+            go install github.com/GeertJohan/go.rice/rice@latest
+            mkdir output
             
             go build -ldflags="-s -w" -a -v -o TechChallengeApp .
 
             pushd ui
             rice append --exec ../TechChallengeApp
             popd
+
+            go test -v -race -cover ./...
+
+            ./TechChallengeApp --version | sed -e 's/TechChallengeApp version /v./' > versionfile
 
             cp TechChallengeApp dist/
             cp conf.toml dist/
@@ -65,11 +49,8 @@ jobs:
           command: |
             export version=$(cat versionfile)
             echo $version
-            export shvar=$(git tag)
             export tagvalue=$(git tag | grep ${version})
             export prerelease=$(echo ${version} | grep 'pre-release')
-            echo $shvar
-            echo ====
             if [ -z "${tagvalue}" ]; then
               go install github.com/tcnksm/ghr@latest
 
@@ -84,13 +65,42 @@ jobs:
 
       - store_artifacts:
           path: output
+          destination: artifacts
+
+  dockerize:
+    docker:
+      - image: docker:20.10
+    steps:
+      - attach_workspace:
+          at: artifacts
+      - checkout
+      # Build and tag the docker image
+      - run:
+          name: Build and tag Docker image
+          command: |
+            version=$(cat versionfile)
+            docker build -t us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version} .
+            docker images
+      # Authenticate with GCP and push the image to the Artifact Registry
+      - run:
+          name: Push Docker image to GCP Artifact Registry
+          command: |
+            echo ${GCLOUD_SERVICE_KEY} > key.json
+            gcloud auth activate-service-account --key-file=$GCLOUD_SERVICE_ACCOUNT_KEY
+            gcloud auth configure-docker
+            docker push us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version} .
           
 workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - build
-      - deploy:
+      - build:
+          filters:
+            branches:
+              only: master
+            tags:
+              ignore: /.*/
+      - dockerize:
           requires: 
             - build
           filters:
