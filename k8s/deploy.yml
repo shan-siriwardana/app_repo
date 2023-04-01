@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: demoapp-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: demoapp
@@ -33,3 +33,19 @@ spec:
           initialDelaySeconds: 15
           periodSeconds: 20
           timeoutSeconds: 5
+      initContainers:
+      - name: init
+        image: us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:{IMAGE_TAG}
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            export PGHOST=$(cat ./conf.toml |  grep DbHost | awk -F' = "' '{print $2}' | awk -F"\"" '{print $1}' )
+            export PGDATABASE=$(cat ./conf.toml |  grep DbName | awk -F' = "' '{print $2}' | awk -F"\"" '{print $1}')
+            export PGUSER=$(cat ./conf.toml |  grep DbUser | awk -F' = "' '{print $2}' | awk -F"\"" '{print $1}')
+            export PGPASSWORD=$(cat ./conf.toml |  grep DbPassword | awk -F' = "' '{print $2}' | awk -F"\"" '{print $1}')
+            if psql -h $PGHOST -d $PGDATABASE -c "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'tasks');" --tuples-only --no-align | grep -q "t";
+            then
+              echo "table found";
+            else
+              ./TechChallengeApp updatedb -s
+            fi

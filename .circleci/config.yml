@@ -21,49 +21,49 @@ jobs:
             fi
             
             mkdir -p dist
-            # go get -v -t -d ./...
-            # go install github.com/GeertJohan/go.rice/rice@latest
-            # mkdir output
+            go get -v -t -d ./...
+            go install github.com/GeertJohan/go.rice/rice@latest
+            mkdir output
 
-            echo "v0.14.5" > versionfile
+            # echo "v0.14.5" > versionfile
             
-            # go build -ldflags="-s -w" -a -v -o TechChallengeApp .
+            go build -ldflags="-s -w" -a -v -o TechChallengeApp .
 
-            # pushd ui
-            # rice append --exec ../TechChallengeApp
-            # popd
+            pushd ui
+            rice append --exec ../TechChallengeApp
+            popd
 
-            # go test -v -race -cover ./...
+            go test -v -race -cover ./...
 
-            # ./TechChallengeApp --version | sed -e 's/TechChallengeApp version /v./' > versionfile
+            ./TechChallengeApp --version | sed -e 's/TechChallengeApp version /v./' > versionfile
 
-            # cp TechChallengeApp dist/
-            # cp conf.toml dist/
+            cp TechChallengeApp dist/
+            cp conf.toml dist/
             
-            # rm TechChallengeApp
+            rm TechChallengeApp
 
-            # export version=$(cat versionfile)
+            export version=$(cat versionfile)
             
-            # zip -r "output/TechChallengeApp_${version}_linux64.zip" dist/*
+            zip -r "output/TechChallengeApp_${version}_linux64.zip" dist/*
 
-      # - run:
-      #     name: Release if new version
-      #     command: |
-      #       export version=$(cat versionfile)
-      #       echo $version
-      #       export tagvalue=$(git tag | grep ${version})
-      #       export prerelease=$(echo ${version} | grep 'pre-release')
-      #       if [ -z "${tagvalue}" ]; then
-      #         go install github.com/tcnksm/ghr@latest
+      - run:
+          name: Release if new version
+          command: |
+            export version=$(cat versionfile)
+            echo $version
+            export tagvalue=$(git tag | grep ${version})
+            export prerelease=$(echo ${version} | grep 'pre-release')
+            if [ -z "${tagvalue}" ]; then
+              go install github.com/tcnksm/ghr@latest
 
-      #         if [ -z "${prerelease}" ]; then
-      #           echo "No pre-release in version, creating release"
-      #           ghr -u shan-siriwardana ${version} output
-      #         else
-      #           echo "Found pre-release in version, creating pre-release"
-      #           ghr -u shan-siriwardana -prerelease ${version} output
-      #         fi
-      #       fi
+              if [ -z "${prerelease}" ]; then
+                echo "No pre-release in version, creating release"
+                ghr -u shan-siriwardana ${version} output
+              else
+                echo "Found pre-release in version, creating pre-release"
+                ghr -u shan-siriwardana -prerelease ${version} output
+              fi
+            fi
 
       - store_artifacts:
           path: output
@@ -91,11 +91,6 @@ jobs:
       - run:
           name: Push Docker image to GCP Artifact Registry
           command: |
-            ###Install gcloud CLI
-            ## export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-            # echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-            # curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-            ## apt-get update && apt-get install -y google-cloud-sdk
             version=$(cat versionfile)
             echo ${GCLOUD_SERVICE_ACCOUNT_KEY} > key.json
             gcloud auth activate-service-account --key-file=./key.json
