@@ -85,7 +85,7 @@ jobs:
           name: Build and tag Docker image
           command: |
             version=$(cat versionfile)
-            docker build -t us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version} .
+            docker build --build-arg arch=amd64 -t us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version} .
             docker images
       # Authenticate with GCP and push the image to the Artifact Registry
       - run:
