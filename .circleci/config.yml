@@ -119,6 +119,9 @@ jobs:
           name: Apply deployment and service manifests
           command: |
             version=$(cat versionfile)
+            echo $version
+            pwd
+            ls -latr
             sed -i "s/{IMAGE_TAG}/$version/g" k8s/deploy.yml
             cat k8s/deploy.yml
             kubectl apply -f k8s/deploy.yml
