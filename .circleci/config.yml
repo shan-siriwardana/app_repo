@@ -67,7 +67,10 @@ jobs:
 
       - store_artifacts:
           path: output
-          destination: artifacts
+      - persist_to_workspace:
+          root: .
+          paths:
+            - versionfile
 
   dockerize:
     docker:
@@ -75,12 +78,12 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: artifacts
+          at: .
       # Build and tag the docker image
       - run:
           name: Build and tag Docker image
           command: |
-            version=$(cat artifacts/versionfile)
+            version=$(cat versionfile)
             docker build -t us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version} .
             docker images
       # Authenticate with GCP and push the image to the Artifact Registry
