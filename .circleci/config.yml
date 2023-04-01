@@ -102,7 +102,7 @@ jobs:
             gcloud auth configure-docker us-central1-docker.pkg.dev
             docker push us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version}
   
-   deploy:
+  deploy:
     docker:
       - image: google/cloud-sdk:latest
     steps:
