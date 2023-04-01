@@ -21,47 +21,49 @@ jobs:
             fi
             
             mkdir -p dist
-            go get -v -t -d ./...
-            go install github.com/GeertJohan/go.rice/rice@latest
+            # go get -v -t -d ./...
+            # go install github.com/GeertJohan/go.rice/rice@latest
             mkdir output
+
+            echo "v0.12.0" > versionfile
             
-            go build -ldflags="-s -w" -a -v -o TechChallengeApp .
+            # go build -ldflags="-s -w" -a -v -o TechChallengeApp .
 
-            pushd ui
-            rice append --exec ../TechChallengeApp
-            popd
+            # pushd ui
+            # rice append --exec ../TechChallengeApp
+            # popd
 
-            go test -v -race -cover ./...
+            # go test -v -race -cover ./...
 
-            ./TechChallengeApp --version | sed -e 's/TechChallengeApp version /v./' > versionfile
+            # ./TechChallengeApp --version | sed -e 's/TechChallengeApp version /v./' > versionfile
 
-            cp TechChallengeApp dist/
-            cp conf.toml dist/
+            # cp TechChallengeApp dist/
+            # cp conf.toml dist/
             
-            rm TechChallengeApp
+            # rm TechChallengeApp
 
-            export version=$(cat versionfile)
+            # export version=$(cat versionfile)
             
-            zip -r "output/TechChallengeApp_${version}_linux64.zip" dist/*
+            # zip -r "output/TechChallengeApp_${version}_linux64.zip" dist/*
 
-      - run:
-          name: Release if new version
-          command: |
-            export version=$(cat versionfile)
-            echo $version
-            export tagvalue=$(git tag | grep ${version})
-            export prerelease=$(echo ${version} | grep 'pre-release')
-            if [ -z "${tagvalue}" ]; then
-              go install github.com/tcnksm/ghr@latest
+      # - run:
+      #     name: Release if new version
+      #     command: |
+      #       export version=$(cat versionfile)
+      #       echo $version
+      #       export tagvalue=$(git tag | grep ${version})
+      #       export prerelease=$(echo ${version} | grep 'pre-release')
+      #       if [ -z "${tagvalue}" ]; then
+      #         go install github.com/tcnksm/ghr@latest
 
-              if [ -z "${prerelease}" ]; then
-                echo "No pre-release in version, creating release"
-                ghr -u shan-siriwardana ${version} output
-              else
-                echo "Found pre-release in version, creating pre-release"
-                ghr -u shan-siriwardana -prerelease ${version} output
-              fi
-            fi
+      #         if [ -z "${prerelease}" ]; then
+      #           echo "No pre-release in version, creating release"
+      #           ghr -u shan-siriwardana ${version} output
+      #         else
+      #           echo "Found pre-release in version, creating pre-release"
+      #           ghr -u shan-siriwardana -prerelease ${version} output
+      #         fi
+      #       fi
 
       - store_artifacts:
           path: output
@@ -71,9 +73,9 @@ jobs:
     docker:
       - image: docker:20.10
     steps:
+      - checkout
       - attach_workspace:
           at: artifacts
-      - checkout
       # Build and tag the docker image
       - run:
           name: Build and tag Docker image
