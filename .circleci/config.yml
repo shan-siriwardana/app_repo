@@ -21,49 +21,49 @@ jobs:
             fi
             
             mkdir -p dist
-            go get -v -t -d ./...
-            go install github.com/GeertJohan/go.rice/rice@latest
-            mkdir output
+            # go get -v -t -d ./...
+            # go install github.com/GeertJohan/go.rice/rice@latest
+            # mkdir output
 
-            # echo "v0.12.0" > versionfile
+            echo "v0.14.0" > versionfile
             
-            go build -ldflags="-s -w" -a -v -o TechChallengeApp .
+            # go build -ldflags="-s -w" -a -v -o TechChallengeApp .
 
-            pushd ui
-            rice append --exec ../TechChallengeApp
-            popd
+            # pushd ui
+            # rice append --exec ../TechChallengeApp
+            # popd
 
-            go test -v -race -cover ./...
+            # go test -v -race -cover ./...
 
-            ./TechChallengeApp --version | sed -e 's/TechChallengeApp version /v./' > versionfile
+            # ./TechChallengeApp --version | sed -e 's/TechChallengeApp version /v./' > versionfile
 
-            cp TechChallengeApp dist/
-            cp conf.toml dist/
+            # cp TechChallengeApp dist/
+            # cp conf.toml dist/
             
-            rm TechChallengeApp
+            # rm TechChallengeApp
 
-            export version=$(cat versionfile)
+            # export version=$(cat versionfile)
             
-            zip -r "output/TechChallengeApp_${version}_linux64.zip" dist/*
+            # zip -r "output/TechChallengeApp_${version}_linux64.zip" dist/*
 
-      - run:
-          name: Release if new version
-          command: |
-            export version=$(cat versionfile)
-            echo $version
-            export tagvalue=$(git tag | grep ${version})
-            export prerelease=$(echo ${version} | grep 'pre-release')
-            if [ -z "${tagvalue}" ]; then
-              go install github.com/tcnksm/ghr@latest
+      # - run:
+      #     name: Release if new version
+      #     command: |
+      #       export version=$(cat versionfile)
+      #       echo $version
+      #       export tagvalue=$(git tag | grep ${version})
+      #       export prerelease=$(echo ${version} | grep 'pre-release')
+      #       if [ -z "${tagvalue}" ]; then
+      #         go install github.com/tcnksm/ghr@latest
 
-              if [ -z "${prerelease}" ]; then
-                echo "No pre-release in version, creating release"
-                ghr -u shan-siriwardana ${version} output
-              else
-                echo "Found pre-release in version, creating pre-release"
-                ghr -u shan-siriwardana -prerelease ${version} output
-              fi
-            fi
+      #         if [ -z "${prerelease}" ]; then
+      #           echo "No pre-release in version, creating release"
+      #           ghr -u shan-siriwardana ${version} output
+      #         else
+      #           echo "Found pre-release in version, creating pre-release"
+      #           ghr -u shan-siriwardana -prerelease ${version} output
+      #         fi
+      #       fi
 
       - store_artifacts:
           path: output
@@ -101,6 +101,27 @@ jobs:
             gcloud auth activate-service-account --key-file=./key.json
             gcloud auth configure-docker us-central1-docker.pkg.dev
             docker push us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version}
+  
+   deploy:
+    docker:
+      - image: google/cloud-sdk:latest
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Configure gcloud CLI
+          command: |
+            echo ${GCLOUD_SERVICE_ACCOUNT_KEY} > key.json
+            gcloud auth activate-service-account --key-file=./key.json
+            gcloud container clusters get-credentials cluster-1 --zone us-central1-a --project tst-project-112334
+      - run:
+          name: Apply deployment and service manifests
+          command: |
+            version=$(cat versionfile)
+            sed -i "s/{IMAGE_TAG}/$version/g" k8s/deploy.yaml
+            kubectl apply -f k8s/deploy.yaml 
+            kubectl apply -f k8s/service.yaml
           
 workflows:
   version: 2
@@ -115,6 +136,14 @@ workflows:
       - dockerize:
           requires: 
             - build
+          filters:
+            branches:
+              only: master
+            tags:
+              ignore: /.*/
+      - deploy:
+          requires: 
+            - dockerize
           filters:
             branches:
               only: master

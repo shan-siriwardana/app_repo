@@ -1,35 +1,40 @@
-ARG arch
-FROM --platform=linux/amd64 golang:alpine AS build
+# ARG arch
+# FROM --platform=linux/amd64 golang:alpine AS build
 
-RUN apk add --no-cache curl git alpine-sdk
+# RUN apk add --no-cache curl git alpine-sdk
 
-ARG SWAGGER_UI_VERSION=4.8.0
+# ARG SWAGGER_UI_VERSION=4.8.0
 
-RUN curl -sfL https://github.com/swagger-api/swagger-ui/archive/v$SWAGGER_UI_VERSION.tar.gz | tar xz -C /tmp/ \
-    && mv /tmp/swagger-ui-$SWAGGER_UI_VERSION /tmp/swagger \
-    && sed -i 's#"https://petstore\.swagger\.io/v2/swagger\.json"#"./swagger.json"#g' /tmp/swagger/dist/index.html
+# RUN curl -sfL https://github.com/swagger-api/swagger-ui/archive/v$SWAGGER_UI_VERSION.tar.gz | tar xz -C /tmp/ \
+#     && mv /tmp/swagger-ui-$SWAGGER_UI_VERSION /tmp/swagger \
+#     && sed -i 's#"https://petstore\.swagger\.io/v2/swagger\.json"#"./swagger.json"#g' /tmp/swagger/dist/index.html
 
-RUN go install github.com/go-swagger/go-swagger/cmd/swagger@latest
-RUN go install github.com/GeertJohan/go.rice/rice@latest
+# RUN go install github.com/go-swagger/go-swagger/cmd/swagger@latest
+# RUN go install github.com/GeertJohan/go.rice/rice@latest
 
-WORKDIR $GOPATH/src/github.com/servian/TechChallengeApp
+# WORKDIR $GOPATH/src/github.com/servian/TechChallengeApp
 
-COPY . .
+# COPY . .
 
-RUN go mod tidy
+# RUN go mod tidy
 
-RUN CGO_ENABLED="0" GOARCH=${arch} go build -ldflags="-s -w" -a -o /TechChallengeApp
-RUN swagger generate spec -o /swagger.json \
- && cp /swagger.json ui/assets/swagger/ \
- && cp -R /tmp/swagger/dist/* ui/assets/swagger
+# RUN CGO_ENABLED="0" GOARCH=${arch} go build -ldflags="-s -w" -a -o /TechChallengeApp
+# RUN swagger generate spec -o /swagger.json \
+#  && cp /swagger.json ui/assets/swagger/ \
+#  && cp -R /tmp/swagger/dist/* ui/assets/swagger
 
-RUN cd ui && rice append --exec /TechChallengeApp
+# RUN cd ui && rice append --exec /TechChallengeApp
 
-FROM --platform=linux/${arch} alpine:latest
+# FROM --platform=linux/${arch} alpine:latest
 
-WORKDIR /TechChallengeApp
+# WORKDIR /TechChallengeApp
 
-COPY conf.toml ./conf.toml
-COPY --from=build /TechChallengeApp TechChallengeApp
+# COPY conf.toml ./conf.toml
+# COPY --from=build /TechChallengeApp TechChallengeApp
 
-ENTRYPOINT [ "./TechChallengeApp" ]
+# ENTRYPOINT [ "./TechChallengeApp" ]
+
+FROM nginx:latest
+RUN echo "Hello, World!" > /usr/share/nginx/html/index.html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
