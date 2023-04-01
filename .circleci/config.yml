@@ -80,6 +80,7 @@ jobs:
       - attach_workspace:
           at: .
       # Build and tag the docker image
+      - setup_remote_docker
       - run:
           name: Build and tag Docker image
           command: |
