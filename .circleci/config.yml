@@ -100,7 +100,7 @@ jobs:
             gcloud auth activate-service-account --key-file=./key.json
             cat ./key.json
             gcloud auth configure-docker
-            docker push us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version}
+            docker push us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:v2
           
 workflows:
   version: 2
