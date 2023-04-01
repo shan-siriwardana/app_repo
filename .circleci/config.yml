@@ -25,7 +25,7 @@ jobs:
             # go install github.com/GeertJohan/go.rice/rice@latest
             # mkdir output
 
-            echo "v0.14.1" > versionfile
+            echo "v0.14.2" > versionfile
             
             # go build -ldflags="-s -w" -a -v -o TechChallengeApp .
 
@@ -125,6 +125,7 @@ jobs:
             sed -i "s/{IMAGE_TAG}/$version/g" k8s/deploy.yml
             cat k8s/deploy.yml
             kubectl apply -f k8s/deploy.yml
+            kubectl apply -f k8s/hpa.yml
             kubectl apply -f k8s/service.yml
           
 workflows:
