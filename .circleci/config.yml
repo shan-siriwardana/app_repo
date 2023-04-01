@@ -96,13 +96,11 @@ jobs:
             # echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
             # curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
             ## apt-get update && apt-get install -y google-cloud-sdk
+            version=$(cat versionfile)
             echo ${GCLOUD_SERVICE_ACCOUNT_KEY} > key.json
             gcloud auth activate-service-account --key-file=./key.json
-            cat ./key.json
             gcloud auth configure-docker
             docker push us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version}
-          environment:
-            version: $version
           
 workflows:
   version: 2
