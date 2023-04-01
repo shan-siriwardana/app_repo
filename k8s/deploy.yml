@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demoapp-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demoapp
+  template:
+    metadata:
+      labels:
+        app: demoapp
+    spec:
+      containers:
+      - name: demoapp
+        image: us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:{IMAGE_TAG}
+        ports:
+        - containerPort: 3000
