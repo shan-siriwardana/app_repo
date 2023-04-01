@@ -25,7 +25,7 @@ RUN swagger generate spec -o /swagger.json \
 
 RUN cd ui && rice append --exec /TechChallengeApp
 
-FROM --platform=linux/${arch} alpine:latest
+FROM --platform=linux/${arch} postgres:13-alpine
 
 WORKDIR /TechChallengeApp
 

@@ -25,7 +25,7 @@ jobs:
             # go install github.com/GeertJohan/go.rice/rice@latest
             # mkdir output
 
-            echo "v0.14.4" > versionfile
+            echo "v0.14.5" > versionfile
             
             # go build -ldflags="-s -w" -a -v -o TechChallengeApp .
 
