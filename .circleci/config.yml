@@ -109,7 +109,7 @@ jobs:
           command: |
             echo ${GCLOUD_SERVICE_ACCOUNT_KEY} > key.json
             gcloud auth activate-service-account --key-file=./key.json
-            gcloud container clusters get-credentials cluster-1 --zone us-central1-a --project tst-project-112334
+            gcloud container clusters get-credentials demoapp-cluster --zone us-central1-a --project tst-project-112334
       - run:
           name: Apply deployment and service manifests
           command: |
