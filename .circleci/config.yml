@@ -115,7 +115,7 @@ jobs:
           name: Apply deployment and service manifests
           command: |
             version=$(cat versionfile)
-            sed -i 's/{GCP_REGION}/'"$GCP_REGION"'/g; s/{GCP_PROJECT_ID}/'"$GCP_PROJECT_ID"'/g; s/{GCP_AF_REPO}/'"$GCP_AF_REPO"'/g';s/{GCP_AF_REGISTRY}/'"$GCP_AF_REGISTRY"'/g;s/{IMAGE_TAG}/'"$version"'/g; k8s/deploy.yml
+            sed -i 's/{GCP_REGION}/'"$GCP_REGION"'/g; s/{GCP_PROJECT_ID}/'"$GCP_PROJECT_ID"'/g; s/{GCP_AF_REPO}/'"$GCP_AF_REPO"'/g'; s/{GCP_AF_REGISTRY}/'"$GCP_AF_REGISTRY"'/g; s/{IMAGE_TAG}/'"$version"'/g' k8s/deploy.yml
             kubectl apply -f k8s/deploy.yml
             kubectl apply -f k8s/hpa.yml
             kubectl apply -f k8s/service.yml
