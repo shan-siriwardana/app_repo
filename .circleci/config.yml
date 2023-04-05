@@ -84,8 +84,9 @@ jobs:
       - run:
           name: Build and tag Docker image
           command: |
+            sed -i 's/{DB_USER}/'"$DB_USER"'/g; s/{DB_PASSWORD}/'"$DB_PASSWORD"'/g; s/{DB_HOST}/'"$DB_HOST"'/g' conf.toml
             version=$(cat versionfile)
-            docker build --build-arg arch=amd64 -t us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version} .
+            docker build --build-arg arch=amd64 -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_AF_REPO}/${GCP_AF_REGISTRY}:${version} .
             docker images
       # Authenticate with GCP and push the image to the Artifact Registry
       - run:
@@ -94,8 +95,8 @@ jobs:
             version=$(cat versionfile)
             echo ${GCLOUD_SERVICE_ACCOUNT_KEY} > key.json
             gcloud auth activate-service-account --key-file=./key.json
-            gcloud auth configure-docker us-central1-docker.pkg.dev
-            docker push us-central1-docker.pkg.dev/tst-project-112334/demoapp/demoapp:${version}
+            gcloud auth configure-docker ${GCP_REGION}-docker.pkg.dev
+            docker push ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_AF_REPO}/${GCP_AF_REGISTRY}:${version}
   
   deploy:
     docker:
@@ -109,7 +110,7 @@ jobs:
           command: |
             echo ${GCLOUD_SERVICE_ACCOUNT_KEY} > key.json
             gcloud auth activate-service-account --key-file=./key.json
-            gcloud container clusters get-credentials demoapp-cluster --zone us-central1-a --project tst-project-112334
+            gcloud container clusters get-credentials demoapp-cluster --zone ${GKE_ZONE} --project ${GCP_PROJECT_ID}
       - run:
           name: Apply deployment and service manifests
           command: |
