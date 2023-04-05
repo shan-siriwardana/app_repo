@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: demoapp
-        image: ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_AF_REPO}/${GCP_AF_REGISTRY}:{IMAGE_TAG}
+        image: {GCP_REGION}-docker.pkg.dev/{GCP_PROJECT_ID}/{GCP_AF_REPO}/{GCP_AF_REGISTRY}:{IMAGE_TAG}
         ports:
         - containerPort: 3000
         args:
@@ -35,7 +35,7 @@ spec:
           timeoutSeconds: 5
       initContainers:
       - name: init
-        image: ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_AF_REPO}/${GCP_AF_REGISTRY}:{IMAGE_TAG}
+        image: {GCP_REGION}-docker.pkg.dev/{GCP_PROJECT_ID}/{GCP_AF_REPO}/{GCP_AF_REGISTRY}:{IMAGE_TAG}
         command: ["/bin/sh", "-c"]
         args:
           - |
