@@ -17,7 +17,7 @@ spec:
         image: {GCP_REGION}-docker.pkg.dev/{GCP_PROJECT_ID}/{GCP_AF_REPO}/{GCP_AF_REGISTRY}:{IMAGE_TAG}
         ports:
         - containerPort: 3000
-        args:
+        args: 
         - "serve"
         readinessProbe:
           httpGet:
