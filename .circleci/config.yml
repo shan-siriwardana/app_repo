@@ -88,7 +88,7 @@ jobs:
             version=$(cat versionfile)
             docker build --build-arg arch=amd64 -t ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_AF_REPO}/${GCP_AF_REGISTRY}:${version} .
             docker images
-      # Authenticate with GCP and push the image to the Artifact Registry
+      # Authenticate with GCP and push the image to the Artifact  Registry
       - run:
           name: Push Docker image to GCP Artifact Registry
           command: |
